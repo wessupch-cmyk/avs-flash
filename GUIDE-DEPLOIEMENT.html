@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guide déploiement PWA AVS Flash</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#0d0f14; --card:#161921; --accent:#f5c842; --accent2:#ff6b4a; --text:#f0f2f7; --muted:#7a8090; --border:#252830; --green:#4af5c8; }
+  * { box-sizing: border-box; margin:0; padding:0; }
+  body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); padding: 2rem 1rem 4rem; max-width: 760px; margin: 0 auto; }
+  h1 { font-family:'Syne',sans-serif; font-size:2rem; color:var(--accent); margin-bottom:.5rem; }
+  .subtitle { color:var(--muted); font-size:.9rem; margin-bottom:2.5rem; }
+  .phase { margin-bottom:2.5rem; }
+  .phase-header {
+    display:flex; align-items:center; gap:.75rem;
+    margin-bottom:1.2rem;
+  }
+  .phase-num {
+    width:36px; height:36px; border-radius:50%;
+    background:var(--accent); color:#000;
+    font-family:'Syne',sans-serif; font-weight:800;
+    display:flex; align-items:center; justify-content:center;
+    font-size:1rem; flex-shrink:0;
+  }
+  .phase-header h2 { font-family:'Syne',sans-serif; font-size:1.2rem; }
+  .phase-header .badge {
+    font-size:.65rem; background:rgba(245,200,66,.15); color:var(--accent);
+    border:1px solid var(--accent); border-radius:99px;
+    padding:.2rem .6rem; letter-spacing:.1em; text-transform:uppercase;
+  }
+  .step {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:12px; padding:1rem 1.2rem;
+    margin-bottom:.75rem;
+    position:relative;
+    padding-left:3rem;
+  }
+  .step::before {
+    content:attr(data-n);
+    position:absolute; left:1rem; top:1rem;
+    width:22px; height:22px; border-radius:50%;
+    background:var(--border); color:var(--muted);
+    font-size:.7rem; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .step h3 { font-size:.9rem; font-weight:700; margin-bottom:.35rem; color:var(--text); }
+  .step p { font-size:.82rem; color:var(--muted); line-height:1.55; }
+  .step p strong { color:var(--accent); }
+  .step p a { color:var(--accent2); text-decoration:none; }
+  code {
+    background:#1e2229; border:1px solid var(--border);
+    border-radius:6px; padding:.15rem .5rem;
+    font-size:.8rem; color:var(--green);
+    font-family:'Courier New',monospace;
+  }
+  .cmd-block {
+    background:#0a0c10; border:1px solid var(--border);
+    border-radius:10px; padding:1rem 1.2rem;
+    margin-top:.5rem;
+    font-family:'Courier New',monospace;
+    font-size:.78rem; color:var(--green);
+    line-height:1.7;
+  }
+  .tip {
+    background:rgba(74,245,200,.07); border-left:3px solid var(--green);
+    border-radius:0 10px 10px 0; padding:.75rem 1rem;
+    font-size:.8rem; color:#a7f3d0; margin-top:.75rem;
+  }
+  .warn {
+    background:rgba(255,107,74,.07); border-left:3px solid var(--accent2);
+    border-radius:0 10px 10px 0; padding:.75rem 1rem;
+    font-size:.8rem; color:#fca5a5; margin-top:.75rem;
+  }
+  .files-grid {
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:.6rem; margin-top:.5rem;
+  }
+  .file-chip {
+    background:#0a0c10; border:1px solid var(--border);
+    border-radius:8px; padding:.5rem .8rem;
+    font-size:.75rem; color:var(--green);
+    font-family:'Courier New',monospace;
+    display:flex; align-items:center; gap:.4rem;
+  }
+  .divider { border:none; border-top:1px solid var(--border); margin:2rem 0; }
+  .result-card {
+    background: linear-gradient(135deg,rgba(245,200,66,.08),rgba(255,107,74,.06));
+    border:1px solid var(--accent);
+    border-radius:16px; padding:1.5rem;
+    text-align:center; margin-top:2rem;
+  }
+  .result-card h2 { font-family:'Syne',sans-serif; color:var(--accent); margin-bottom:.5rem; }
+  .result-card p { color:var(--muted); font-size:.85rem; }
+  .url-example {
+    background:#0a0c10; border:1px solid var(--accent);
+    border-radius:8px; padding:.5rem 1rem;
+    font-family:'Courier New',monospace; font-size:.85rem;
+    color:var(--accent); margin:.75rem auto; display:inline-block;
+  }
+</style>
+</head>
+<body>
+
+<h1>📲 Guide de déploiement</h1>
+<p class="subtitle">Mettre en ligne votre application AVS Flash en 45 minutes — <strong style="color:var(--accent)">100% gratuit</strong></p>
+
+<!-- PHASE 1 -->
+<div class="phase">
+  <div class="phase-header">
+    <div class="phase-num">1</div>
+    <h2>Créer un compte GitHub</h2>
+    <span class="badge">5 min</span>
+  </div>
+
+  <div class="step" data-n="1">
+    <h3>Aller sur github.com</h3>
+    <p>Rendez-vous sur <a href="https://github.com" target="_blank">github.com</a> et cliquez sur <strong>Sign up</strong>. Créez un compte avec votre email professionnel.</p>
+  </div>
+
+  <div class="step" data-n="2">
+    <h3>Confirmer votre email</h3>
+    <p>Vérifiez votre boîte mail et cliquez sur le lien de confirmation envoyé par GitHub.</p>
+  </div>
+</div>
+
+<!-- PHASE 2 -->
+<div class="phase">
+  <div class="phase-header">
+    <div class="phase-num">2</div>
+    <h2>Créer un dépôt (repository)</h2>
+    <span class="badge">5 min</span>
+  </div>
+
+  <div class="step" data-n="1">
+    <h3>Nouveau repository</h3>
+    <p>Cliquez sur le <strong>bouton vert "New"</strong> ou l'icône <strong>+</strong> en haut à droite → <strong>New repository</strong></p>
+  </div>
+
+  <div class="step" data-n="2">
+    <h3>Nommer le repository</h3>
+    <p>Repository name : <code>avs-flash</code><br>
+    Laissez <strong>Public</strong> coché (nécessaire pour GitHub Pages gratuit).<br>
+    Cochez <strong>"Add a README file"</strong>. Cliquez <strong>Create repository</strong>.</p>
+  </div>
+</div>
+
+<!-- PHASE 3 -->
+<div class="phase">
+  <div class="phase-header">
+    <div class="phase-num">3</div>
+    <h2>Uploader les fichiers</h2>
+    <span class="badge">10 min</span>
+  </div>
+
+  <div class="step" data-n="1">
+    <h3>Ouvrir l'upload</h3>
+    <p>Dans votre repository, cliquez sur <strong>"Add file"</strong> → <strong>"Upload files"</strong></p>
+  </div>
+
+  <div class="step" data-n="2">
+    <h3>Télécharger les 5 fichiers depuis ce guide</h3>
+    <p>Vous avez reçu un fichier ZIP contenant ces fichiers à uploader :</p>
+    <div class="files-grid">
+      <div class="file-chip">📄 index.html</div>
+      <div class="file-chip">📋 manifest.json</div>
+      <div class="file-chip">⚙️ sw.js</div>
+      <div class="file-chip">🖼️ icon-192.png</div>
+      <div class="file-chip">🖼️ icon-512.png</div>
+    </div>
+  </div>
+
+  <div class="step" data-n="3">
+    <h3>Glisser-déposer les fichiers</h3>
+    <p>Faites glisser les <strong>5 fichiers</strong> dans la zone de dépôt GitHub. Attendez l'upload complet.</p>
+  </div>
+
+  <div class="step" data-n="4">
+    <h3>Valider le commit</h3>
+    <p>En bas de page, cliquez sur <strong>"Commit changes"</strong> (bouton vert). Laissez le message par défaut.</p>
+  </div>
+</div>
+
+<!-- PHASE 4 -->
+<div class="phase">
+  <div class="phase-header">
+    <div class="phase-num">4</div>
+    <h2>Activer GitHub Pages</h2>
+    <span class="badge">5 min</span>
+  </div>
+
+  <div class="step" data-n="1">
+    <h3>Aller dans les Settings</h3>
+    <p>Dans votre repository, cliquez sur <strong>Settings</strong> (onglet en haut).</p>
+  </div>
+
+  <div class="step" data-n="2">
+    <h3>Trouver "Pages"</h3>
+    <p>Dans le menu gauche, faites défiler jusqu'à <strong>Pages</strong> (sous "Code and automation").</p>
+  </div>
+
+  <div class="step" data-n="3">
+    <h3>Activer le déploiement</h3>
+    <p>Sous <strong>Source</strong>, sélectionnez <strong>"Deploy from a branch"</strong>.<br>
+    Branch : <strong>main</strong> → dossier : <strong>/ (root)</strong>.<br>
+    Cliquez <strong>Save</strong>.</p>
+    <div class="tip">✅ GitHub affichera dans 2-3 minutes : <em>"Your site is live at https://votre-pseudo.github.io/avs-flash/"</em></div>
+  </div>
+</div>
+
+<!-- PHASE 5 -->
+<div class="phase">
+  <div class="phase-header">
+    <div class="phase-num">5</div>
+    <h2>Tester l'installation sur mobile</h2>
+    <span class="badge">5 min</span>
+  </div>
+
+  <div class="step" data-n="1">
+    <h3>Ouvrir l'URL sur votre téléphone</h3>
+    <p>Votre application est accessible à l'adresse :</p>
+    <div class="url-example">https://VOTRE-PSEUDO.github.io/avs-flash/</div>
+  </div>
+
+  <div class="step" data-n="2">
+    <h3>Sur Android (Chrome)</h3>
+    <p>Une bannière <strong>"Installer AVS Flash"</strong> apparaît automatiquement. Acceptez → l'icône s'ajoute sur votre écran d'accueil.</p>
+    <div class="tip">📱 L'app s'ouvre ensuite en plein écran, sans barre d'adresse, comme une vraie app.</div>
+  </div>
+
+  <div class="step" data-n="3">
+    <h3>Sur iPhone (Safari)</h3>
+    <p>Ouvrez l'URL dans <strong>Safari</strong> (pas Chrome). Appuyez sur l'icône <strong>⎋ Partager</strong> → <strong>"Sur l'écran d'accueil"</strong>.</p>
+    <div class="warn">⚠️ Sur iPhone, l'installation PWA fonctionne uniquement depuis Safari, pas depuis Chrome ou Firefox.</div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- NEXT STEPS -->
+<div class="phase">
+  <div class="phase-header">
+    <div class="phase-num">🚀</div>
+    <h2>Étapes suivantes (optionnelles)</h2>
+    <span class="badge">Si ça marche</span>
+  </div>
+
+  <div class="step" data-n="A">
+    <h3>Nom de domaine personnalisé</h3>
+    <p>Achetez <code>avs-conseil.ch</code> sur Infomaniak (~CHF 10/an) et liez-le à GitHub Pages dans les Settings → Pages → Custom domain.</p>
+  </div>
+
+  <div class="step" data-n="B">
+    <h3>Publier sur Google Play (Android)</h3>
+    <p>Via <a href="https://bubblewrap.dev" target="_blank">Bubblewrap</a> ou <a href="https://pwabuilder.com" target="_blank">PWABuilder.com</a>, convertissez votre PWA en APK Android. Compte Google Play : <strong>25$ une seule fois</strong>.</p>
+  </div>
+
+  <div class="step" data-n="C">
+    <h3>Publier sur l'App Store (iPhone)</h3>
+    <p>Nécessite un <strong>compte Apple Developer : 99$/an</strong>. Via PWABuilder ou un développeur. C'est l'étape payante à envisager uniquement si votre service génère des revenus.</p>
+  </div>
+
+  <div class="step" data-n="D">
+    <h3>Ajouter vos coordonnées / branding</h3>
+    <p>Modifiez <code>index.html</code> pour ajouter votre logo, nom de cabinet, et un bouton "Nous contacter" qui pointe vers votre site.</p>
+  </div>
+</div>
+
+<div class="result-card">
+  <h2>🎉 Résultat final</h2>
+  <p>Une application mobile professionnelle, installable sur tous les téléphones,<br>accessible hors ligne, à votre marque — pour <strong style="color:var(--accent)">CHF 0</strong></p>
+  <p style="margin-top:1rem; font-size:.75rem;">Votre URL partageable :</p>
+  <div class="url-example">https://VOTRE-PSEUDO.github.io/avs-flash/</div>
+  <p style="font-size:.75rem; color:var(--muted)">Envoyez ce lien à vos clients — ils pourront l'installer en 1 clic.</p>
+</div>
+
+</body>
+</html>

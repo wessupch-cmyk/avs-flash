@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#f5c842">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AVS Flash">
+<meta name="description" content="30 fiches de préparation au contrôle AVS employeur">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>AVS Flash – Contrôle AVS</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --card-bg: #161921;
+    --accent: #f5c842;
+    --accent2: #ff6b4a;
+    --accent3: #4af5c8;
+    --text: #f0f2f7;
+    --muted: #7a8090;
+    --border: #252830;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    height: 100%;
+    overflow-x: hidden;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding-top: calc(var(--safe-top) + 1rem);
+    padding-bottom: calc(var(--safe-bottom) + 5rem);
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  /* ─── INSTALL BANNER ─── */
+  #installBanner {
+    display: none;
+    position: fixed;
+    bottom: calc(var(--safe-bottom) + 1rem);
+    left: 1rem; right: 1rem;
+    background: linear-gradient(135deg, #1e2229, #252b35);
+    border: 1px solid var(--accent);
+    border-radius: 16px;
+    padding: 1rem 1.2rem;
+    z-index: 1000;
+    box-shadow: 0 8px 32px rgba(0,0,0,.5);
+    animation: slideUp .4s ease;
+  }
+  #installBanner.show { display: flex; gap: 1rem; align-items: center; }
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  #installBanner .ib-icon { font-size: 2rem; flex-shrink: 0; }
+  #installBanner .ib-text { flex: 1; }
+  #installBanner .ib-text strong { display: block; font-size: .9rem; color: var(--accent); margin-bottom: .2rem; }
+  #installBanner .ib-text span { font-size: .75rem; color: var(--muted); }
+  #installBanner .ib-btns { display: flex; flex-direction: column; gap: .4rem; flex-shrink: 0; }
+  #installBanner .btn-install {
+    background: var(--accent); color: #000; font-weight: 700;
+    border: none; border-radius: 8px; padding: .4rem .9rem;
+    font-size: .78rem; cursor: pointer; font-family: 'DM Sans', sans-serif;
+  }
+  #installBanner .btn-dismiss {
+    background: transparent; color: var(--muted);
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: .4rem .9rem; font-size: .78rem; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* ─── iOS INSTALL HINT ─── */
+  #iosHint {
+    display: none;
+    position: fixed;
+    bottom: calc(var(--safe-bottom) + 1rem);
+    left: 1rem; right: 1rem;
+    background: #1e2229;
+    border: 1px solid var(--accent);
+    border-radius: 16px;
+    padding: 1.2rem;
+    z-index: 1000;
+    box-shadow: 0 8px 32px rgba(0,0,0,.5);
+    font-size: .82rem;
+    text-align: center;
+    line-height: 1.6;
+  }
+  #iosHint.show { display: block; }
+  #iosHint strong { color: var(--accent); }
+  #iosHint .close-ios {
+    margin-top: .8rem; display: inline-block;
+    background: var(--border); border: none; color: var(--muted);
+    padding: .4rem 1rem; border-radius: 8px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-size: .8rem;
+  }
+  /* Arrow pointing down */
+  #iosHint::after {
+    content: '▼';
+    position: absolute;
+    bottom: -1.2rem; left: 50%; transform: translateX(-50%);
+    color: var(--accent); font-size: .9rem;
+  }
+
+  /* ─── OFFLINE BADGE ─── */
+  #offlineBadge {
+    display: none;
+    position: fixed; top: calc(var(--safe-top) + .5rem); right: 1rem;
+    background: #333; color: #aaa; font-size: .7rem;
+    padding: .25rem .6rem; border-radius: 99px; z-index: 999;
+  }
+  #offlineBadge.show { display: block; }
+
+  /* ─── HEADER ─── */
+  header { text-align: center; margin-bottom: 1.5rem; }
+  header .badge {
+    display: inline-block;
+    background: var(--accent); color: #000;
+    font-size: .65rem; font-weight: 700;
+    letter-spacing: .15em; padding: .25rem .8rem;
+    border-radius: 2rem; margin-bottom: .75rem;
+    text-transform: uppercase;
+  }
+  header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.6rem, 6vw, 2.4rem);
+    line-height: 1.1; letter-spacing: -.02em;
+  }
+  header h1 span { color: var(--accent); }
+  header p { color: var(--muted); margin-top: .5rem; font-size: .82rem; }
+
+  /* ─── SCORE BAR ─── */
+  .score-row {
+    display: flex; align-items: center; gap: .75rem;
+    max-width: 520px; margin: 0 auto 1rem;
+  }
+  .score-row .label { font-size: .72rem; color: var(--muted); white-space: nowrap; }
+  .prog-wrap {
+    flex: 1; background: var(--border);
+    border-radius: 99px; height: 5px; overflow: hidden;
+  }
+  .prog-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 99px;
+    transition: width .5s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* ─── CARD ─── */
+  .card-wrap {
+    max-width: 520px; margin: 0 auto;
+    perspective: 1200px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .card-inner {
+    position: relative; width: 100%;
+    min-height: 340px;
+    transform-style: preserve-3d;
+    transition: transform .55s cubic-bezier(.4,0,.2,1);
+  }
+  .card-inner.flipped { transform: rotateY(180deg); }
+
+  .card-face {
+    position: absolute; inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 18px;
+    padding: 1.5rem;
+    display: flex; flex-direction: column;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+  }
+  .card-face::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 1.5rem; right: 1.5rem;
+    height: 3px; border-radius: 0 0 4px 4px;
+    background: var(--c, var(--accent));
+  }
+
+  /* FRONT */
+  .card-front .num {
+    font-family: 'Syne', sans-serif;
+    font-size: 3rem; font-weight: 800;
+    color: var(--border); line-height: 1;
+    margin-bottom: .75rem;
+  }
+  .cat-tag {
+    display: inline-flex; align-items: center; gap: .35rem;
+    font-size: .65rem; font-weight: 700;
+    letter-spacing: .1em; text-transform: uppercase;
+    padding: .25rem .7rem; border-radius: 2rem;
+    margin-bottom: 1rem; width: fit-content;
+  }
+  .q-label { font-size: .65rem; color: var(--muted); letter-spacing: .15em; text-transform: uppercase; margin-bottom: .4rem; }
+  .card-front h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1rem, 3.5vw, 1.3rem);
+    line-height: 1.4; flex: 1;
+  }
+  .tap-hint {
+    margin-top: 1rem;
+    display: flex; align-items: center; gap: .4rem;
+    font-size: .7rem; color: var(--muted);
+  }
+  .tap-hint .circle {
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 1.5px solid var(--muted);
+    display: flex; align-items: center; justify-content: center;
+    font-size: .55rem;
+  }
+
+  /* BACK */
+  .card-back { transform: rotateY(180deg); }
+  .a-label { font-size: .65rem; color: var(--muted); letter-spacing: .15em; text-transform: uppercase; margin-bottom: .7rem; }
+  .a-text { font-size: .92rem; line-height: 1.65; flex: 1; color: var(--text); }
+  .a-text strong { color: var(--accent); }
+  .warn-box {
+    margin-top: 1rem;
+    background: rgba(255,107,74,.08);
+    border-left: 3px solid var(--accent2);
+    border-radius: 0 10px 10px 0;
+    padding: .65rem .9rem;
+    font-size: .76rem; color: #f5a89a;
+    display: flex; gap: .4rem; align-items: flex-start;
+  }
+  .warn-box .wi { font-size: .9rem; flex-shrink: 0; margin-top: .05rem; }
+
+  /* ─── BUTTONS ─── */
+  .btn-row {
+    max-width: 520px; margin: 1rem auto 0;
+    display: grid; grid-template-columns: 1fr auto 1fr;
+    gap: .6rem; align-items: center;
+  }
+  .btn {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: .82rem; font-weight: 500;
+    padding: .65rem .8rem;
+    border-radius: 12px; cursor: pointer;
+    transition: all .2s;
+    display: flex; align-items: center; justify-content: center; gap: .3rem;
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn:disabled { opacity: .3; cursor: default; }
+  .btn-flip {
+    background: var(--accent); border-color: var(--accent);
+    color: #000; font-weight: 700;
+    padding: .65rem 1.2rem;
+  }
+  .btn-flip:hover { background: #ffd966; border-color: #ffd966; color: #000; }
+
+  /* ─── SWIPE INDICATOR ─── */
+  .swipe-hint {
+    text-align: center; font-size: .68rem; color: var(--muted);
+    margin-top: .5rem;
+  }
+
+  /* ─── CATEGORY FILTER ─── */
+  .section-title {
+    max-width: 520px; margin: 2rem auto .75rem;
+    font-size: .7rem; color: var(--muted);
+    letter-spacing: .15em; text-transform: uppercase;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .section-title::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+  .cat-scroll {
+    max-width: 520px; margin: 0 auto;
+    display: flex; gap: .5rem;
+    overflow-x: auto; padding-bottom: .5rem;
+    scrollbar-width: none;
+  }
+  .cat-scroll::-webkit-scrollbar { display: none; }
+  .cat-chip {
+    flex-shrink: 0;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: .4rem .9rem;
+    cursor: pointer;
+    font-size: .72rem;
+    display: flex; align-items: center; gap: .35rem;
+    transition: all .2s;
+    white-space: nowrap;
+  }
+  .cat-chip:hover, .cat-chip.active {
+    border-color: var(--accent);
+    background: rgba(245,200,66,.07);
+    color: var(--accent);
+  }
+  .cat-chip .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+  /* ─── STATS ─── */
+  .stats-row {
+    max-width: 520px; margin: 1.5rem auto 0;
+    display: grid; grid-template-columns: repeat(3,1fr); gap: .6rem;
+  }
+  .stat-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px; padding: .75rem;
+    text-align: center;
+  }
+  .stat-card .sv { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800; color: var(--accent); }
+  .stat-card .sl { font-size: .65rem; color: var(--muted); margin-top: .1rem; }
+
+  /* ─── FOOTER ─── */
+  footer { text-align: center; margin-top: 2rem; font-size: .7rem; color: var(--muted); }
+  footer strong { color: var(--accent); }
+
+  @media (max-width: 400px) {
+    .card-face { padding: 1.2rem; }
+    .card-front h2 { font-size: .95rem; }
+    .btn-row { gap: .4rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Offline badge -->
+<div id="offlineBadge">📴 Hors ligne</div>
+
+<!-- Install banner (Android/Chrome) -->
+<div id="installBanner">
+  <div class="ib-icon">📲</div>
+  <div class="ib-text">
+    <strong>Installer l'application</strong>
+    <span>Accès rapide depuis votre écran d'accueil</span>
+  </div>
+  <div class="ib-btns">
+    <button class="btn-install" id="btnInstall">Installer</button>
+    <button class="btn-dismiss" id="btnDismiss">Plus tard</button>
+  </div>
+</div>
+
+<!-- iOS hint -->
+<div id="iosHint">
+  <strong>📲 Installer sur votre iPhone</strong><br>
+  Appuyez sur <strong>⎋ Partager</strong> puis<br>
+  <strong>« Sur l'écran d'accueil »</strong>
+  <br>
+  <button class="close-ios" id="closeIos">Fermer</button>
+</div>
+
+<header>
+  <div class="badge">🇨🇭 30 Fiches · AVS</div>
+  <h1>Contrôle <span>AVS</span></h1>
+  <p>Préparez votre entreprise — tapez la carte pour la retourner</p>
+</header>
+
+<div class="score-row">
+  <span class="label" id="scoreLabel">1 / 30</span>
+  <div class="prog-wrap"><div class="prog-fill" id="progFill" style="width:3.33%"></div></div>
+  <span class="label" id="seenLabel">0 vues</span>
+</div>
+
+<div class="card-wrap" id="cardWrap" onclick="flipCard()">
+  <div class="card-inner" id="cardInner">
+    <div class="card-face card-front" id="cardFront"></div>
+    <div class="card-face card-back" id="cardBack"></div>
+  </div>
+</div>
+
+<div class="btn-row">
+  <button class="btn" id="btnPrev" onclick="navigate(-1)">← Préc.</button>
+  <button class="btn btn-flip" onclick="flipCard()">🔄</button>
+  <button class="btn" id="btnNext" onclick="navigate(1)">Suiv. →</button>
+</div>
+<div class="swipe-hint">← Glissez la carte ou utilisez les boutons →</div>
+
+<div class="section-title">Catégories</div>
+<div class="cat-scroll" id="catScroll"></div>
+
+<div class="stats-row">
+  <div class="stat-card"><div class="sv" id="sSeen">0</div><div class="sl">Vues</div></div>
+  <div class="stat-card"><div class="sv" id="sTotal">30</div><div class="sl">Total</div></div>
+  <div class="stat-card"><div class="sv" id="sPct">0%</div><div class="sl">Avancement</div></div>
+</div>
+
+<footer>
+  <p style="margin-bottom:.3rem">© 2025 – <strong>AVS Flash</strong> · Outil de préparation professionnelle</p>
+  <p>Ces fiches sont à titre indicatif. Consultez un spécialiste pour tout conseil personnalisé.</p>
+</footer>
+
+<script>
+// ─── DATA ──────────────────────────────────────────────────────────────
+const CARDS = [
+  { cat:"Masse salariale", cc:"#f5c842", q:"Quels éléments de rémunération doivent obligatoirement être déclarés comme salaire déterminant AVS ?", a:"Tout versement en espèces ou en nature : <strong>salaire de base, primes, gratifications, commissions, indemnités de vacances, 13e salaire</strong>, avantages en nature (véhicule privé, logement), participation aux bénéfices.", w:"Risque : toute omission constitue une sous-déclaration → rappel de cotisations + intérêts moratoires (5%/an)." },
+  { cat:"Masse salariale", cc:"#f5c842", q:"Les remboursements de frais sont-ils soumis à cotisations AVS ?", a:"Les frais <strong>effectifs et documentés</strong> sont exonérés. En revanche, les forfaits de frais <strong>non approuvés par l'autorité fiscale</strong> et sans justificatifs sont soumis à cotisations.", w:"Risque : absence de règlement de frais validé = requalification en salaire déterminant lors du contrôle." },
+  { cat:"Masse salariale", cc:"#f5c842", q:"Comment sont traités les véhicules de société à usage privé ?", a:"L'usage privé est un avantage en nature soumis à AVS. Forfait : <strong>0,9% du prix d'achat par mois</strong>. Sans livre de bord, le contrôleur applique ce forfait automatiquement.", w:"Risque : aucun avantage déclaré + pas de livre de bord = redressement systématique." },
+  { cat:"Masse salariale", cc:"#f5c842", q:"Les indemnités de départ sont-elles soumises à cotisations AVS ?", a:"En principe <strong>oui</strong>, sauf réparation de tort moral ou dommages réels prouvés. Le délai de prescription est de <strong>5 ans</strong>.", w:"Risque : classification incorrecte en «dommages et intérêts» sans base contractuelle = redressement intégral." },
+  { cat:"Statut", cc:"#4af5c8", q:"Quels critères distinguent un indépendant d'un salarié au sens AVS ?", a:"Risque économique propre, <strong>liberté d'organisation</strong>, multiplicité de clients, investissement en capital, absence de lien de subordination. Un faisceau d'indices défavorables conduit à la requalification.", w:"Risque : requalification en salarié = rappel de la totalité des cotisations employeur + salarié + intérêts." },
+  { cat:"Statut", cc:"#4af5c8", q:"Comment traiter un associé-gérant de Sàrl vis-à-vis de l'AVS ?", a:"Il est considéré comme <strong>salarié</strong> et doit percevoir un salaire conforme au marché soumis à AVS. Les dividendes excessifs peuvent être requalifiés en salaire.", w:"Risque : rémunération trop faible + dividendes élevés = requalification partielle en salaire déterminant." },
+  { cat:"Statut", cc:"#4af5c8", q:"Quel est le régime AVS pour les membres de la famille travaillant dans l'entreprise ?", a:"Conjoints et partenaires enregistrés <strong>doivent être déclarés</strong> avec un salaire conforme. Les enfants collaborateurs dès 17 ans cotisent également à l'AVS.", w:"Risque : famille non déclarée = lacune de cotisations et absence de couverture sociale." },
+  { cat:"Statut", cc:"#4af5c8", q:"Comment s'applique l'AVS pour les travailleurs étrangers détachés en Suisse ?", a:"L'AVS est due dès le 1er jour. Des conventions bilatérales peuvent exonérer si l'employeur fournit un <strong>formulaire A1 valide</strong> avant le début du travail.", w:"Risque : absence de formulaire A1 ou dépassement de durée = double cotisation + amende." },
+  { cat:"Taux & calcul", cc:"#ff6b4a", q:"Quels sont les taux de cotisations AVS/AI/APG en 2025 ?", a:"AVS 8,7% + AI 1,4% + APG 0,5% = <strong>10,6% total</strong>, partagé à parts égales : <strong>5,3% employeur + 5,3% salarié</strong>.", w:"Risque : application d'un taux erroné ou absence de déclaration des nouvelles tranches = écart cumulé sur plusieurs années." },
+  { cat:"Taux & calcul", cc:"#ff6b4a", q:"Existe-t-il un plafond de salaire pour les cotisations AVS ?", a:"<strong>Non</strong>, aucun plafond (contrairement au 2e pilier). Les cotisations AVS sont dues sur l'intégralité du salaire, sans limite supérieure.", w:"Risque : croyance erronée qu'au-delà d'un seuil les cotisations cessent = sous-déclaration sur les hauts salaires." },
+  { cat:"Taux & calcul", cc:"#ff6b4a", q:"Comment calculer les cotisations sur les salaires en nature (logement, repas) ?", a:"Selon les <strong>barèmes officiels OFAS</strong> : repas CHF 3.50/repas, logement à la valeur locative du marché. Ces montants s'ajoutent au salaire déclaré.", w:"Risque : oubli des repas/logements fournis = sous-déclaration fréquente dans la restauration et l'hôtellerie." },
+  { cat:"Taux & calcul", cc:"#ff6b4a", q:"Quel est le traitement AVS des options et actions d'employés (equity) ?", a:"Soumis à cotisations AVS au moment du <strong>vesting</strong>. La valeur vénale à cette date est le salaire déterminant.", w:"Risque : oubli des plans d'intéressement = redressement important, notamment dans les start-ups." },
+  { cat:"Délais", cc:"#a78bfa", q:"Quand les acomptes de cotisations AVS doivent-ils être versés ?", a:"<strong>Dans les 10 jours suivant la fin du mois</strong>. Le décompte annuel doit être transmis <strong>avant le 30 janvier</strong> de l'année suivante.", w:"Risque : paiements tardifs = intérêts moratoires à 5%/an + rappels + éventuelles majorations." },
+  { cat:"Délais", cc:"#a78bfa", q:"Quel est le délai de prescription pour les rappels de cotisations AVS ?", a:"Prescription ordinaire : <strong>5 ans</strong> dès la fin de l'année civile. En cas de fraude intentionnelle : <strong>15 ans</strong>.", w:"Risque : un contrôle peut remonter jusqu'à 5 exercices. En cas de fraude : 15 ans examinés." },
+  { cat:"Délais", cc:"#a78bfa", q:"Que se passe-t-il si un employeur ne transmet pas son décompte annuel ?", a:"La caisse peut procéder à une <strong>taxation d'office</strong> sur la base des années précédentes, généralement majorée. Des frais de sommation et intérêts s'ajoutent.", w:"Risque : taxation d'office souvent supérieure à la réalité + frais = coût supplémentaire évitable." },
+  { cat:"Documentation", cc:"#34d399", q:"Quels documents tenir à disposition lors d'un contrôle AVS ?", a:"<strong>Livres de salaires</strong>, contrats de travail, fiches de salaire, preuves de paiement, règlement de frais, décisions de bonus, attestations-quittances, liste du personnel avec dates d'entrée/sortie.", w:"Risque : documents absents ou incomplets = estimation par le contrôleur, souvent défavorable à l'employeur." },
+  { cat:"Documentation", cc:"#34d399", q:"Combien de temps conserver les pièces comptables liées aux salaires ?", a:"Documents comptables : <strong>10 ans</strong> (droit commercial). Données personnelles des employés : <strong>5 ans minimum</strong> après la fin des rapports de travail.", w:"Risque : destruction prématurée = impossibilité de se défendre + présomption défavorable." },
+  { cat:"Documentation", cc:"#34d399", q:"Un règlement de frais est-il obligatoire ?", a:"Non légalement, mais <strong>nécessaire</strong> pour que les forfaits soient admis sans cotisation. Il doit être signé et idéalement <strong>validé par l'autorité fiscale cantonale</strong>.", w:"Risque : sans règlement validé, tous les forfaits (représentation, véhicule, téléphone) deviennent du salaire déterminant." },
+  { cat:"Documentation", cc:"#34d399", q:"Comment prouver le caractère professionnel des frais lors d'un contrôle ?", a:"Par des <strong>justificatifs datés et nominatifs</strong>, un lien documenté avec l'activité, un livre de bord pour les véhicules. Sans lien documenté, la dépense est présumée privée.", w:"Risque : forfaits sans politique écrite ni justificatifs = redressement sur l'ensemble des frais versés." },
+  { cat:"Cas particuliers", cc:"#fb923c", q:"Comment déclarer les pourboires reçus par les employés à l'AVS ?", a:"Les pourboires <strong>centralisés par l'employeur</strong> font partie du salaire déterminant. Les pourboires spontanés de clients peuvent être exemptés si documentés.", w:"Risque : non-déclaration des pourboires centralisés = redressement fréquent en restauration." },
+  { cat:"Cas particuliers", cc:"#fb923c", q:"Les indemnités journalières maladie versées via l'employeur sont-elles soumises à AVS ?", a:"Oui si l'<strong>assureur verse à l'employeur</strong> qui reverse au salarié. Non si l'assureur verse directement au salarié malade.", w:"Risque : confusion sur le flux de paiement = erreur systématique sur toutes les absences maladie." },
+  { cat:"Cas particuliers", cc:"#fb923c", q:"Les frais de formation continue payés par l'employeur sont-ils soumis à AVS ?", a:"<strong>Exonérés</strong> si formation en lien direct avec le poste actuel. Soumis si formation personnelle ou sans lien avec l'activité.", w:"Risque : remboursement sans documentation du lien professionnel = requalification." },
+  { cat:"Cas particuliers", cc:"#fb923c", q:"Les chèques-repas (Reka, Lunch-Check) sont-ils soumis à AVS ?", a:"Uniquement sur la <strong>part subventionnée dépassant la valeur OFAS</strong> du repas (environ CHF 7/repas en 2025). La part au prix du marché est exonérée.", w:"Risque : déclaration de la valeur nominale totale ou omission complète = erreur fréquente." },
+  { cat:"Cas particuliers", cc:"#fb923c", q:"Un cadeau non monétaire (iPad, voyage) offert par l'employeur est-il soumis à cotisations ?", a:"Oui, <strong>tout avantage en nature</strong> entre dans le salaire déterminant. La valeur vénale du bien est retenue.", w:"Risque : cadeaux de fin d'année non déclarés = redressement sur la valeur totale des avantages accordés." },
+  { cat:"Sanctions", cc:"#f87171", q:"Quelle est la sanction si un employeur ne retient pas les cotisations du salarié ?", a:"L'employeur est <strong>personnellement responsable</strong> de la totalité (part employeur + salarié). Les organes peuvent être tenus <strong>personnellement responsables</strong> en cas de faillite (art. 52 LAVS).", w:"Risque : responsabilité personnelle des administrateurs et gérants pour les cotisations impayées." },
+  { cat:"Sanctions", cc:"#f87171", q:"Quelles amendes peuvent être infligées lors d'un contrôle AVS ?", a:"Négligence : jusqu'à <strong>CHF 5'000</strong>. Soustraction intentionnelle : jusqu'à <strong>CHF 30'000</strong>. Fraude grave : poursuite pénale.", w:"Risque : l'ignorance de la loi n'exclut pas la responsabilité. Les infractions par négligence sont punissables." },
+  { cat:"Sanctions", cc:"#f87171", q:"Les intérêts moratoires courent-ils dès le début des cotisations non payées ?", a:"Oui, dès le <strong>1er du mois suivant l'échéance</strong>. Taux : <strong>5% par an</strong>. Sur plusieurs années, le montant peut être très significatif.", w:"Exemple : CHF 50'000 sous-déclarés sur 5 ans = ~CHF 12'500 d'intérêts en sus du rappel principal." },
+  { cat:"Sanctions", cc:"#f87171", q:"Est-il possible de contester une décision de redressement AVS ?", a:"Oui. <strong>Réclamation dans les 30 jours</strong> auprès de la caisse. Si rejet : recours au Tribunal cantonal des assurances, puis Tribunal fédéral.", w:"Délai impératif : 30 jours. Passé ce délai, la décision devient définitive et exécutoire." },
+  { cat:"Bonnes pratiques", cc:"#60a5fa", q:"Comment se préparer efficacement à un contrôle AVS employeur ?", a:"Tenir un <strong>classeur de contrôle annuel</strong> : contrats, livres de salaires, règlement de frais, A1, décomptes versés, extrait de compte caisse. Désigner un interlocuteur RH/fiduciaire formé.", w:"Conseil : un contrôle AVS a lieu tous les 3 à 6 ans. Une préparation proactive réduit de 80% le risque de redressement." },
+  { cat:"Bonnes pratiques", cc:"#60a5fa", q:"Quand une entreprise doit-elle s'affilier à une caisse de compensation ?", a:"<strong>Avant le premier versement de salaire</strong>. Également obligatoire dès que le gérant ou associé perçoit une rémunération.", w:"Risque : début d'activité sans affiliation = arriérés de cotisations depuis le 1er jour + intérêts." },
+  { cat:"Bonnes pratiques", cc:"#60a5fa", q:"Que faire si l'entreprise découvre elle-même une erreur dans ses déclarations AVS passées ?", a:"Faire une <strong>autodénonciation spontanée</strong> auprès de la caisse avant tout contrôle annoncé. Cela réduit ou supprime les amendes (mais pas les cotisations dues ni les intérêts).", w:"Conseil clé : régulariser spontanément est toujours moins coûteux qu'attendre un contrôle." }
+];
+
+// ─── STATE ─────────────────────────────────────────────────────────────
+let idx = 0, flipped = false, filterCat = null;
+let deferredPrompt = null;
+const seen = new Set();
+
+function filtered() { return filterCat ? CARDS.filter(c => c.cat === filterCat) : CARDS; }
+
+// ─── RENDER ────────────────────────────────────────────────────────────
+function render() {
+  const cards = filtered();
+  const card = cards[idx];
+  const globalN = CARDS.indexOf(card) + 1;
+
+  flipped = false;
+  document.getElementById('cardInner').classList.remove('flipped');
+
+  document.getElementById('cardFront').style.setProperty('--c', card.cc);
+  document.getElementById('cardBack').style.setProperty('--c', card.cc);
+
+  document.getElementById('cardFront').innerHTML = `
+    <div class="num">${String(globalN).padStart(2,'0')}</div>
+    <div class="cat-tag" style="background:${card.cc}22;color:${card.cc}">● ${card.cat}</div>
+    <div class="q-label">❓ Question</div>
+    <h2>${card.q}</h2>
+    <div class="tap-hint"><div class="circle">↩</div> Tapez pour la réponse</div>
+  `;
+
+  document.getElementById('cardBack').innerHTML = `
+    <div class="a-label">✅ Réponse</div>
+    <div class="a-text">${card.a}</div>
+    <div class="warn-box"><span class="wi">⚠️</span><span>${card.w}</span></div>
+  `;
+
+  const total = cards.length;
+  const pct = ((idx+1)/total*100).toFixed(1);
+  document.getElementById('progFill').style.width = pct + '%';
+  document.getElementById('scoreLabel').textContent = `${idx+1} / ${total}`;
+  document.getElementById('btnPrev').disabled = idx === 0;
+  document.getElementById('btnNext').disabled = idx === total - 1;
+
+  seen.add(CARDS.indexOf(card));
+  updateStats();
+}
+
+function flipCard() {
+  flipped = !flipped;
+  document.getElementById('cardInner').classList.toggle('flipped', flipped);
+}
+
+function navigate(dir) {
+  const cards = filtered();
+  idx = Math.max(0, Math.min(cards.length-1, idx+dir));
+  render();
+}
+
+function updateStats() {
+  const s = seen.size;
+  document.getElementById('sSeen').textContent = s;
+  document.getElementById('seenLabel').textContent = s + ' vues';
+  document.getElementById('sTotal').textContent = filtered().length;
+  document.getElementById('sPct').textContent = Math.round(s / CARDS.length * 100) + '%';
+}
+
+// ─── CATEGORIES ────────────────────────────────────────────────────────
+function buildCats() {
+  const scroll = document.getElementById('catScroll');
+  const cats = [...new Set(CARDS.map(c=>c.cat))];
+
+  const all = Object.assign(document.createElement('div'), { className: 'cat-chip active', id:'cat-all' });
+  all.innerHTML = `<span class="dot" style="background:var(--accent)"></span>Toutes (${CARDS.length})`;
+  all.onclick = () => setFilter(null);
+  scroll.appendChild(all);
+
+  cats.forEach(cat => {
+    const cc = CARDS.find(c=>c.cat===cat).cc;
+    const n = CARDS.filter(c=>c.cat===cat).length;
+    const chip = Object.assign(document.createElement('div'), { className:'cat-chip' });
+    chip.dataset.cat = cat;
+    chip.innerHTML = `<span class="dot" style="background:${cc}"></span>${cat} (${n})`;
+    chip.onclick = () => setFilter(cat);
+    scroll.appendChild(chip);
+  });
+}
+
+function setFilter(cat) {
+  filterCat = cat; idx = 0;
+  document.querySelectorAll('.cat-chip').forEach(el => el.classList.remove('active'));
+  const el = cat ? document.querySelector(`[data-cat="${cat}"]`) : document.getElementById('cat-all');
+  if (el) el.classList.add('active');
+  render();
+}
+
+// ─── SWIPE SUPPORT ─────────────────────────────────────────────────────
+let startX = 0;
+const wrap = document.getElementById('cardWrap');
+wrap.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive:true });
+wrap.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - startX;
+  if (Math.abs(dx) > 50) { navigate(dx < 0 ? 1 : -1); }
+  else { flipCard(); }
+}, { passive:true });
+
+// ─── KEYBOARD ──────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key==='ArrowRight') navigate(1);
+  else if (e.key==='ArrowLeft') navigate(-1);
+  else if (e.key===' '||e.key==='Enter') { e.preventDefault(); flipCard(); }
+});
+
+// ─── PWA INSTALL ───────────────────────────────────────────────────────
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installBanner').classList.add('show');
+});
+
+document.getElementById('btnInstall').onclick = async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  document.getElementById('installBanner').classList.remove('show');
+};
+
+document.getElementById('btnDismiss').onclick = () => {
+  document.getElementById('installBanner').classList.remove('show');
+};
+
+// iOS detection
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+const isInStandalone = window.matchMedia('(display-mode: standalone)').matches;
+if (isIOS && !isInStandalone) {
+  setTimeout(() => document.getElementById('iosHint').classList.add('show'), 3000);
+}
+document.getElementById('closeIos').onclick = () => {
+  document.getElementById('iosHint').classList.remove('show');
+};
+
+// ─── OFFLINE ───────────────────────────────────────────────────────────
+window.addEventListener('offline', () => document.getElementById('offlineBadge').classList.add('show'));
+window.addEventListener('online', () => document.getElementById('offlineBadge').classList.remove('show'));
+
+// ─── SERVICE WORKER ────────────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+
+// ─── INIT ──────────────────────────────────────────────────────────────
+buildCats();
+render();
+</script>
+</body>
+</html>
